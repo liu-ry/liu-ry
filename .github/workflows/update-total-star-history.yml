@@ -1,0 +1,41 @@
+name: Update Total Star History
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0,12 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-star-history:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Generate total star history
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STAR_HISTORY_USERNAME: liu-ry
+          STAR_HISTORY_INCLUDE_FORKS: "true"
+          STAR_HISTORY_INCLUDE_PRIVATE: "false"
+        run: python .github/scripts/generate_total_star_history.py
+
+      - name: Commit updated chart
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -z "$(git status --porcelain -- assets/github-stars-total.svg assets/github-stars-total.json)" ]; then
+            echo "No star history changes to commit."
+            exit 0
+          fi
+          git add assets/github-stars-total.svg assets/github-stars-total.json
+          git commit -m "chore: update total star history"
+          git push

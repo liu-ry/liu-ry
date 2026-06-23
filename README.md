@@ -5,3 +5,15 @@
 <p align="center">
   Embodied AI | Robotics | Reinforcement Learning | Generative Models
 </p>
+
+## Total GitHub Stars
+
+Daily-updated cumulative stars across all public repositories I own, including forks.
+
+<p align="center">
+  <img src="./assets/github-stars-total.svg" alt="Total GitHub stars history across repositories owned by liu-ry" width="100%" />
+</p>
+
+<p align="center">
+  <sub>Source data: <a href="./assets/github-stars-total.json">assets/github-stars-total.json</a> • refreshes daily via GitHub Actions</sub>
+</p>
