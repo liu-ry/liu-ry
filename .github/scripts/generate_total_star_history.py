@@ -24,7 +24,6 @@ API_ROOT = "https://api.github.com"
 API_VERSION = "2022-11-28"
 DEFAULT_USERNAME = "liu-ry"
 DEFAULT_OUTPUT_SVG = Path("assets/github-stars-total.svg")
-DEFAULT_OUTPUT_JSON = Path("assets/github-stars-total.json")
 STAR_HISTORY_TEMPLATE_URL = "https://api.star-history.com/chart?repos=liu-ry%2FEmbodiedZero&type=date&legend=top-left"
 
 
@@ -450,71 +449,14 @@ def render_svg(
     output_path.write_text(svg, encoding="utf-8")
 
 
-def write_json(
-    username: str,
-    repos: list[Repo],
-    series: list[tuple[date, int]],
-    daily_new_stars: Counter[date],
-    output_path: Path,
-) -> None:
-    latest_day, latest_total = series[-1]
-    repo_payload = []
-    private_index = 0
-    for repo in repos:
-        if repo.private:
-            private_index += 1
-            repo_payload.append(
-                {
-                    "name": f"private-repo-{private_index}",
-                    "full_name": f"{username}/private-repo-{private_index}",
-                    "html_url": None,
-                    "description": None,
-                    "created_at": repo.created_at.isoformat().replace("+00:00", "Z"),
-                    "stargazers_count": repo.stargazers_count,
-                    "fork": repo.fork,
-                    "private": True,
-                }
-            )
-            continue
-        repo_payload.append(
-            {
-                "name": repo.name,
-                "full_name": repo.full_name,
-                "html_url": repo.html_url,
-                "description": repo.description,
-                "created_at": repo.created_at.isoformat().replace("+00:00", "Z"),
-                "stargazers_count": repo.stargazers_count,
-                "fork": repo.fork,
-                "private": False,
-            }
-        )
-
-    payload = {
-        "username": username,
-        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-        "repo_count": len(repos),
-        "repos_with_stars": sum(1 for repo in repos if repo.stargazers_count > 0),
-        "private_repo_count": sum(1 for repo in repos if repo.private),
-        "fork_repo_count": sum(1 for repo in repos if repo.fork),
-        "latest_total_stars": latest_total,
-        "latest_day": compact_date(latest_day),
-        "stars_gained_today": daily_new_stars[latest_day],
-        "series": [{"date": compact_date(day), "total_stars": total} for day, total in series],
-        "repos": repo_payload,
-    }
-    output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
 def main() -> int:
     username = os.environ.get("STAR_HISTORY_USERNAME", DEFAULT_USERNAME)
     output_svg = Path(os.environ.get("STAR_HISTORY_OUTPUT_SVG", DEFAULT_OUTPUT_SVG))
-    output_json = Path(os.environ.get("STAR_HISTORY_OUTPUT_JSON", DEFAULT_OUTPUT_JSON))
     include_forks = os.environ.get("STAR_HISTORY_INCLUDE_FORKS", "true").lower() in {"1", "true", "yes"}
     include_private = os.environ.get("STAR_HISTORY_INCLUDE_PRIVATE", "false").lower() in {"1", "true", "yes"}
     token = os.environ.get("STAR_HISTORY_TOKEN") or os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
 
     output_svg.parent.mkdir(parents=True, exist_ok=True)
-    output_json.parent.mkdir(parents=True, exist_ok=True)
 
     repos = list_repos(username=username, token=token, include_forks=include_forks, include_private=include_private)
     series, daily_new_stars = build_series(repos=repos, token=token)
@@ -524,13 +466,6 @@ def main() -> int:
         series=series,
         daily_new_stars=daily_new_stars,
         output_path=output_svg,
-    )
-    write_json(
-        username=username,
-        repos=repos,
-        series=series,
-        daily_new_stars=daily_new_stars,
-        output_path=output_json,
     )
 
     print(
@@ -543,7 +478,6 @@ def main() -> int:
                 "latest_total_stars": series[-1][1],
                 "latest_day": compact_date(series[-1][0]),
                 "output_svg": str(output_svg),
-                "output_json": str(output_json),
             },
             ensure_ascii=False,
         )
