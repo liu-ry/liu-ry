@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="58" viewBox="0 0 860 58" role="img" aria-labelledby="title desc">
+  <title id="title">Typing introduction</title>
+  <desc id="desc">Hello coders, I'm liu-ry, welcome!</desc>
+  <defs>
+    <clipPath id="typing-window">
+      <rect x="36" y="0" width="0" height="58">
+        <animate attributeName="width" values="0;790;790" keyTimes="0;.78;1" dur="5.2s" repeatCount="indefinite"/>
+      </rect>
+    </clipPath>
+    <style>
+      .text{font:700 30px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.5px}
+    </style>
+  </defs>
+  <rect width="860" height="58" fill="none"/>
+  <g clip-path="url(#typing-window)">
+    <text class="text" x="38" y="39" fill="#f74609">Hello &lt;coders/&gt;! I'm liu-ry, welcome!</text>
+  </g>
+  <rect x="36" y="14" width="4" height="31" fill="#f74609">
+    <animate attributeName="x" values="36;826;826" keyTimes="0;.78;1" dur="5.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;1;0;1;0;1" dur=".8s" repeatCount="indefinite"/>
+  </rect>
+</svg>

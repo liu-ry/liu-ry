@@ -14,8 +14,25 @@
       <path stroke="currentColor" d="M-1 423.833H.5V.5H-1" class="domain" filter="url(#xkcdify)" style="stroke:#000"/>
       <g class="tick"><path stroke="currentColor" d="M0 423.333h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 423.333)"> </text></g><g class="tick"><path stroke="currentColor" d="M0 338.666h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 338.666)">2</text></g><g class="tick"><path stroke="currentColor" d="M0 254h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 254)">4</text></g><g class="tick"><path stroke="currentColor" d="M0 169.333h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 169.333)">6</text></g><g class="tick"><path stroke="currentColor" d="M0 84.667h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 84.667)">8</text></g><g class="tick"><path stroke="currentColor" d="M0 0h-1"/><text x="-7" fill="currentColor" dy=".32em" style="font-family:xkcd;font-size:16px;fill:#000" transform="translate(0 0)">10</text></g>
     </g>
-    <path fill="none" stroke="#dd4528" d="M0 423.333C8.974 423.333 8.974 338.666 17.949 338.666C116.667 338.666 116.667 296.333 215.385 296.333C233.333 296.333 233.333 254 251.282 254C439.744 254 439.744 211.667 628.205 211.667C646.154 211.667 646.154 127 664.103 127C682.051 127 682.051 127 700 127" class="xkcd-chart-xyline" filter="url(#xkcdify)"/>
+    <path id="star-race-track" fill="none" stroke="#dd4528" d="M0 423.333C8.974 423.333 8.974 338.666 17.949 338.666C116.667 338.666 116.667 296.333 215.385 296.333C233.333 296.333 233.333 254 251.282 254C439.744 254 439.744 211.667 628.205 211.667C646.154 211.667 646.154 127 664.103 127C682.051 127 682.051 127 700 127" class="xkcd-chart-xyline" filter="url(#xkcdify)" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="0">
+      <animate attributeName="stroke-dashoffset" values="1000;0;0" keyTimes="0;.82;1" dur="6s" repeatCount="indefinite"/>
+    </path>
     <circle cx="17.949" cy="338.666" r="4.5" fill="#dd4528" stroke="#fff" stroke-width="2"/><circle cx="215.385" cy="296.333" r="4.5" fill="#dd4528" stroke="#fff" stroke-width="2"/><circle cx="251.282" cy="254" r="4.5" fill="#dd4528" stroke="#fff" stroke-width="2"/><circle cx="628.205" cy="211.667" r="4.5" fill="#dd4528" stroke="#fff" stroke-width="2"/><circle cx="664.103" cy="127" r="4.5" fill="#dd4528" stroke="#fff" stroke-width="2"/>
+    <g id="star-race-car" transform="translate(-14 -11)">
+      <animateMotion dur="6s" repeatCount="indefinite" rotate="auto" keyPoints="0;1;1" keyTimes="0;.82;1" calcMode="linear">
+        <mpath href="#star-race-track"/>
+      </animateMotion>
+      <path d="M-18 8c-7 0-12 3-15 8" fill="none" stroke="#f6b73c" stroke-linecap="round" stroke-width="3" opacity=".75">
+        <animate attributeName="opacity" values=".1;.75;.1" dur=".28s" repeatCount="indefinite"/>
+      </path>
+      <path d="M5 4h19l8 9h6c4 0 7 3 7 7v4H-3v-9c0-6 3-11 8-11Z" fill="#ef4438" stroke="#111" stroke-linejoin="round" stroke-width="2.5"/>
+      <path d="M21 6l6 7H13l3-7Z" fill="#9fe7ff" stroke="#111" stroke-linejoin="round" stroke-width="2"/>
+      <path d="M-2 17h47" stroke="#fff7d6" stroke-linecap="round" stroke-width="2"/>
+      <circle cx="8" cy="26" r="6" fill="#111"/>
+      <circle cx="34" cy="26" r="6" fill="#111"/>
+      <circle cx="8" cy="26" r="2.4" fill="#fff"/>
+      <circle cx="34" cy="26" r="2.4" fill="#fff"/>
+    </g>
     <svg>
       <svg><rect width="171.5" height="32" x="8" y="5" fill-opacity=".85" stroke="#000" stroke-width="2" filter="url(#xkcdify)" rx="5" ry="5" style="fill:#fff"/></svg>
       <svg><rect width="8" height="8" x="15" y="17" filter="url(#xkcdify)" rx="2" ry="2" style="fill:#dd4528"/><text x="29" y="25" style="font-size:15px;fill:#000">liu-ry/all-repos</text></svg>
