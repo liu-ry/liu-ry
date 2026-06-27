@@ -40,14 +40,17 @@ jobs:
       - name: Add star race animation
         run: node scripts/inject-star-race-animation.mjs
 
+      - name: Update README image cache buster
+        run: node scripts/update-star-image-cache-bust.mjs
+
       - name: Commit updated chart
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -z "$(git status --porcelain -- assets/github-stars-total.svg)" ]; then
+          if [ -z "$(git status --porcelain -- README.md assets/github-stars-total.svg)" ]; then
             echo "No star history changes to commit."
             exit 0
           fi
-          git add assets/github-stars-total.svg
+          git add README.md assets/github-stars-total.svg
           git commit -m "chore: update total star history"
           git push
