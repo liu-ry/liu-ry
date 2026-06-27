@@ -3,14 +3,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 const file = new URL("../assets/github-stars-total.svg", import.meta.url);
 let svg = readFileSync(file, "utf8");
 
-if (svg.includes('id="star-race-track"') && svg.includes('id="star-race-car"')) {
-  console.log("Star race animation already present.");
-  process.exit(0);
-}
-
-const linePattern =
+const staticLinePattern =
   /<path fill="none" stroke="#dd4528" d="([^"]+)" class="xkcd-chart-xyline" filter="url\(#xkcdify\)"\/>/;
-const lineMatch = svg.match(linePattern);
+const animatedLinePattern =
+  /<path id="star-race-track" fill="none" stroke="#dd4528" d="([^"]+)" class="xkcd-chart-xyline" filter="url\(#xkcdify\)" pathLength="1000" stroke-dasharray="1000" stroke-dashoffset="0">[\s\S]*?<\/path>/;
+const lineMatch = svg.match(staticLinePattern) || svg.match(animatedLinePattern);
 
 if (!lineMatch) {
   throw new Error("Could not find the red star-history line to animate.");
@@ -37,11 +34,17 @@ const raceCar = `    <g id="star-race-car" transform="translate(-14 -11)">
       <circle cx="34" cy="26" r="2.4" fill="#fff"/>
     </g>`;
 
-svg = svg.replace(linePattern, animatedLine);
-
-if (!svg.includes('id="star-race-car"')) {
-  svg = svg.replace(/(    <circle cx="19\.444"[\s\S]*?<\/circle>\n)/, `$1${raceCar}\n`);
+if (!svg.includes('id="star-race-track"')) {
+  svg = svg.replace(staticLinePattern, animatedLine);
 }
+
+svg = svg.replace(/    <g id="star-race-car"[\s\S]*?^    <\/g>\n?/m, "");
+
+const legendPattern = /(\n    <svg>\n      <svg><rect width="171\.5")/;
+if (!legendPattern.test(svg)) {
+  throw new Error("Could not find the chart legend insertion point for the race car.");
+}
+svg = svg.replace(legendPattern, `\n${raceCar}$1`);
 
 writeFileSync(file, svg);
 console.log("Injected star race animation.");
