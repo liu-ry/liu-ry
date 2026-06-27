@@ -19,5 +19,5 @@
 Daily-updated cumulative stars across all public repositories I own, including forks.
 
 <p align="center">
-  <img src="./assets/github-stars-total.svg?v=429e81a17914" alt="Total GitHub stars history across repositories owned by liu-ry" width="100%" />
+  <img src="./assets/github-stars-total.svg?v=cfc58482d910" alt="Total GitHub stars history across repositories owned by liu-ry" width="100%" />
 </p>
