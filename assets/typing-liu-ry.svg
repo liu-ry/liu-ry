@@ -2,6 +2,15 @@
   <title id="title">Typing introduction</title>
   <desc id="desc">Hello coders, I'm liu-ry, welcome!</desc>
   <defs>
+    <linearGradient id="typing-rainbow" x1="36" y1="0" x2="826" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2f80ed"/>
+      <stop offset="17%" stop-color="#00a878"/>
+      <stop offset="34%" stop-color="#f2c94c"/>
+      <stop offset="51%" stop-color="#00b8d9"/>
+      <stop offset="68%" stop-color="#9b51e0"/>
+      <stop offset="84%" stop-color="#ff7ab6"/>
+      <stop offset="100%" stop-color="#6fcf97"/>
+    </linearGradient>
     <clipPath id="typing-window">
       <rect x="36" y="0" width="0" height="58">
         <animate attributeName="width" values="0;790;790" keyTimes="0;.78;1" dur="5.2s" repeatCount="indefinite"/>
@@ -13,9 +22,9 @@
   </defs>
   <rect width="860" height="58" fill="none"/>
   <g clip-path="url(#typing-window)">
-    <text class="text" x="38" y="39" fill="#f74609">Hello &lt;coders/&gt;! I'm liu-ry, welcome!</text>
+    <text class="text" x="38" y="39" fill="url(#typing-rainbow)">Hello &lt;coders/&gt;! I'm liu-ry, welcome!</text>
   </g>
-  <rect x="36" y="14" width="4" height="31" fill="#f74609">
+  <rect x="36" y="14" width="4" height="31" fill="#7b61ff">
     <animate attributeName="x" values="36;826;826" keyTimes="0;.78;1" dur="5.2s" repeatCount="indefinite"/>
     <animate attributeName="opacity" values="1;1;0;1;0;1" dur=".8s" repeatCount="indefinite"/>
   </rect>
