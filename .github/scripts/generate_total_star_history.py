@@ -165,13 +165,17 @@ def list_star_dates(repo: Repo, token: str | None) -> list[date]:
 def build_series(repos: list[Repo], token: str | None) -> tuple[list[tuple[date, int]], Counter[date]]:
     today = datetime.now(timezone.utc).date()
     daily_new_stars: Counter[date] = Counter()
+    errors: list[str] = []
     for repo in repos:
         try:
             for star_day in list_star_dates(repo, token):
                 daily_new_stars[star_day] += 1
         except RuntimeError as exc:
             visibility = "private" if repo.private else "public"
-            print(f"warning: skipped {visibility} repo {repo.full_name}; could not read stargazers. {exc}", file=sys.stderr)
+            errors.append(f"skipped {visibility} repo {repo.full_name}; could not read stargazers. {exc}")
+
+    if errors:
+        raise RuntimeError("Could not build complete star history:\n" + "\n".join(errors))
 
     start_day = min(daily_new_stars) - timedelta(days=1) if daily_new_stars else today - timedelta(days=29)
 
@@ -460,6 +464,12 @@ def main() -> int:
 
     repos = list_repos(username=username, token=token, include_forks=include_forks, include_private=include_private)
     series, daily_new_stars = build_series(repos=repos, token=token)
+    current_total_stars = sum(repo.stargazers_count for repo in repos)
+    if series[-1][1] != current_total_stars:
+        raise RuntimeError(
+            f"Generated star history total ({series[-1][1]}) does not match "
+            f"current repository star total ({current_total_stars})."
+        )
     render_svg(
         username=username,
         repos=repos,
@@ -476,6 +486,7 @@ def main() -> int:
                 "private_repo_count": sum(1 for repo in repos if repo.private),
                 "fork_repo_count": sum(1 for repo in repos if repo.fork),
                 "latest_total_stars": series[-1][1],
+                "current_total_stars": current_total_stars,
                 "latest_day": compact_date(series[-1][0]),
                 "output_svg": str(output_svg),
             },

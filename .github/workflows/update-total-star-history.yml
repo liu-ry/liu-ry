@@ -4,6 +4,14 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "2-59/5 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-total-star-history.yml"
+      - ".github/scripts/generate_total_star_history.py"
+      - "scripts/inject-star-race-animation.mjs"
+      - "scripts/update-star-image-cache-bust.mjs"
 
 permissions:
   contents: write
