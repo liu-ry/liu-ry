@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <img src="./assets/typing-liu-ry.svg" alt="Hello coders, I'm liu-ry, welcome!" width="860" />
+  <img src="./assets/typing-liu-ry-rainbow.svg" alt="Hello coders, I'm liu-ry, welcome!" width="860" />
 </p>
 
 ## Total GitHub Stars
