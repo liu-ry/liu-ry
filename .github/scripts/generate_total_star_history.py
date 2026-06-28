@@ -24,6 +24,7 @@ API_ROOT = "https://api.github.com"
 API_VERSION = "2022-11-28"
 DEFAULT_USERNAME = "liu-ry"
 DEFAULT_OUTPUT_SVG = Path("assets/github-stars-total.svg")
+DEFAULT_OUTPUT_DATA = Path("assets/github-stars-total-data.json")
 STAR_HISTORY_TEMPLATE_URL = "https://api.star-history.com/chart?repos=liu-ry%2FEmbodiedZero&type=date&legend=top-left"
 
 
@@ -187,6 +188,50 @@ def build_series(repos: list[Repo], token: str | None) -> tuple[list[tuple[date,
         series.append((cursor, running_total))
         cursor += timedelta(days=1)
     return series, daily_new_stars
+
+
+def star_data_payload(daily_new_stars: Counter[date]) -> dict:
+    return {
+        "schema_version": 1,
+        "daily_new_stars": {
+            compact_date(day): daily_new_stars[day]
+            for day in sorted(daily_new_stars)
+            if daily_new_stars[day] > 0
+        },
+    }
+
+
+def read_star_data(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"warning: could not read existing star data snapshot. {exc}", file=sys.stderr)
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def daily_star_data(payload: dict | None) -> dict:
+    if not payload:
+        return {}
+    daily_new_stars = payload.get("daily_new_stars")
+    return daily_new_stars if isinstance(daily_new_stars, dict) else {}
+
+
+def write_star_data(path: Path, payload: dict) -> None:
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_github_output(name: str, value: str) -> None:
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if not github_output:
+        return
+    with Path(github_output).open("a", encoding="utf-8") as output:
+        output.write(f"{name}={value}\n")
 
 
 def format_number(value: int) -> str:
@@ -456,11 +501,13 @@ def render_svg(
 def main() -> int:
     username = os.environ.get("STAR_HISTORY_USERNAME", DEFAULT_USERNAME)
     output_svg = Path(os.environ.get("STAR_HISTORY_OUTPUT_SVG", DEFAULT_OUTPUT_SVG))
+    output_data = Path(os.environ.get("STAR_HISTORY_OUTPUT_DATA", DEFAULT_OUTPUT_DATA))
     include_forks = os.environ.get("STAR_HISTORY_INCLUDE_FORKS", "true").lower() in {"1", "true", "yes"}
     include_private = os.environ.get("STAR_HISTORY_INCLUDE_PRIVATE", "false").lower() in {"1", "true", "yes"}
     token = os.environ.get("STAR_HISTORY_TOKEN") or os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
 
     output_svg.parent.mkdir(parents=True, exist_ok=True)
+    output_data.parent.mkdir(parents=True, exist_ok=True)
 
     repos = list_repos(username=username, token=token, include_forks=include_forks, include_private=include_private)
     series, daily_new_stars = build_series(repos=repos, token=token)
@@ -470,6 +517,30 @@ def main() -> int:
             f"Generated star history total ({series[-1][1]}) does not match "
             f"current repository star total ({current_total_stars})."
         )
+    next_star_data = star_data_payload(daily_new_stars)
+    previous_star_data = read_star_data(output_data)
+    changed = daily_star_data(previous_star_data) != daily_star_data(next_star_data)
+    write_github_output("changed", "true" if changed else "false")
+
+    if not changed:
+        print(
+            json.dumps(
+                {
+                    "username": username,
+                    "changed": False,
+                    "repo_count": len(repos),
+                    "latest_total_stars": series[-1][1],
+                    "current_total_stars": current_total_stars,
+                    "latest_day": compact_date(series[-1][0]),
+                    "output_svg": str(output_svg),
+                    "output_data": str(output_data),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
+
+    write_star_data(output_data, next_star_data)
     render_svg(
         username=username,
         repos=repos,
@@ -482,6 +553,7 @@ def main() -> int:
         json.dumps(
             {
                 "username": username,
+                "changed": True,
                 "repo_count": len(repos),
                 "private_repo_count": sum(1 for repo in repos if repo.private),
                 "fork_repo_count": sum(1 for repo in repos if repo.fork),
@@ -489,6 +561,7 @@ def main() -> int:
                 "current_total_stars": current_total_stars,
                 "latest_day": compact_date(series[-1][0]),
                 "output_svg": str(output_svg),
+                "output_data": str(output_data),
             },
             ensure_ascii=False,
         )

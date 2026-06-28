@@ -37,6 +37,7 @@ jobs:
           node-version: "22"
 
       - name: Generate total star history
+        id: generate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           STAR_HISTORY_USERNAME: liu-ry
@@ -45,16 +46,18 @@ jobs:
         run: python .github/scripts/generate_total_star_history.py
 
       - name: Add star race animation
+        if: steps.generate.outputs.changed == 'true'
         run: node scripts/inject-star-race-animation.mjs
 
       - name: Commit updated chart
+        if: steps.generate.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -z "$(git status --porcelain -- assets/github-stars-total.svg)" ]; then
+          if [ -z "$(git status --porcelain -- assets/github-stars-total.svg assets/github-stars-total-data.json)" ]; then
             echo "No star history changes to commit."
             exit 0
           fi
-          git add assets/github-stars-total.svg
+          git add assets/github-stars-total.svg assets/github-stars-total-data.json
           git commit -m "chore: update total star history"
           git push
